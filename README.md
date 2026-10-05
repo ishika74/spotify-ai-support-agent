@@ -9,8 +9,6 @@ The project processes Spotify customer-support messages, classifies the customer
 **Streamlit App:**
 https://spotify-ai-support-agent-8ayxy8hzodn4vhzkipz5un.streamlit.app/
 
----
-
 ## Problem Statement
 
 Customer-support teams receive a large number of repetitive questions and complaints. Manually classifying every issue, searching previous conversations, and preparing an appropriate response can be time-consuming.
@@ -401,4 +399,151 @@ The application can be deployed using Streamlit Community Cloud.
 
 ### Configuration
 
-1. Connect the GitHub repository to Streamlit Community Clou
+1. Connect the GitHub repository to Streamlit Community Cloud.
+2. Select:
+
+```text
+Repository:
+ishika74/spotify-ai-support-agent
+```
+
+3. Select the `main` branch.
+4. Set the main application file to:
+
+```text
+app.py
+```
+
+5. Add the Gemini API key under Streamlit Secrets:
+
+```toml
+GOOGLE_API_KEY = "your_gemini_api_key"
+```
+
+6. Deploy the application.
+
+The application should then be accessible through the generated Streamlit Community Cloud URL.
+
+---
+
+## Evaluation
+
+The repository contains evaluation utilities for testing different parts of the support-agent workflow.
+
+### Classification Evaluation
+
+The classifier can be evaluated against labelled examples and compared with simple baselines such as:
+
+* majority-class prediction
+* keyword-based prediction
+
+### Escalation Evaluation
+
+The evaluation scripts test whether potentially sensitive or high-priority customer issues are correctly identified for human review.
+
+### Retrieval
+
+The retrieval module uses TF-IDF and cosine similarity to identify historically similar customer-support conversations.
+
+### LLM-as-a-Judge
+
+Generated responses can be evaluated using an LLM-based evaluator that considers:
+
+```text
+Groundedness
+Correctness
+Tone
+Actionability
+```
+
+The project also includes a small human-calibrated set for comparing judge behavior with human assessments.
+
+> Evaluation results may vary depending on the dataset, Gemini API availability, and API quota limits.
+
+---
+
+## Example Workflow
+
+A customer might enter:
+
+```text
+My Spotify keeps stopping every few seconds. What is wrong?
+```
+
+The support workflow can identify the issue as a playback-related problem, check whether escalation is necessary, and generate an appropriate support response.
+
+For the modular retrieval pipeline, the system can additionally search historical support conversations for similar messages and use the retrieved examples when drafting a response.
+
+---
+
+## Limitations
+
+* The project uses a relatively small sample of customer-support conversations.
+* The dataset may not cover every possible customer issue.
+* Keyword-based classification can fail on ambiguous or unfamiliar wording.
+* Rule-based escalation detection cannot replace human judgment.
+* TF-IDF retrieval is less semantically powerful than modern embedding-based retrieval.
+* Gemini-generated responses may require human review.
+* The LLM-as-a-judge evaluation uses a small calibration set.
+* Gemini API requests may be affected by quota or rate limits.
+* The application is a prototype and is not connected to Spotify's internal customer-support infrastructure.
+* Conversation history is session-based and is not backed by persistent storage.
+
+---
+
+## Future Improvements
+
+Potential improvements include:
+
+* Replace keyword classification with a trained or LLM-based classifier.
+* Connect the retrieval pipeline directly to the deployed Streamlit application.
+* Replace TF-IDF with embedding-based semantic retrieval.
+* Add a persistent vector database.
+* Add persistent conversation memory.
+* Improve escalation detection using a hybrid rules + ML approach.
+* Add human-agent handoff functionality.
+* Add persistent support-ticket storage.
+* Add authentication and user management.
+* Add analytics and monitoring.
+* Expand the evaluation dataset.
+* Increase the human-calibration set for the LLM judge.
+* Add automated feedback-based improvement.
+* Add production-grade logging and observability.
+
+---
+
+## Security
+
+API keys must be stored securely.
+
+For local development:
+
+```text
+.env
+```
+
+should be used for environment variables.
+
+For Streamlit Community Cloud:
+
+```text
+Streamlit Secrets
+```
+
+should be used.
+
+The following should never be committed to the repository:
+
+```text
+.env
+venv/
+__pycache__/
+```
+
+API keys and other credentials should never be included in source code, README files, screenshots, or public commits.
+
+---
+
+## Author
+
+**Ishika Razdan**
