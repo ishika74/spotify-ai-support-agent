@@ -1,66 +1,60 @@
 # Spotify AI Support Agent
 
-An AI-powered customer-support assistant developed for the Hiver SDE Intern assignment.
+An AI-powered customer-support assistant built for the Hiver SDE Intern assignment.
 
-The application processes Spotify customer-support messages, identifies the customer’s issue, generates an appropriate response using Google Gemini, and detects cases that may require escalation to a human support agent.
+The project processes Spotify customer-support messages, classifies the customer's issue, detects cases that may require human escalation, retrieves similar historical support conversations through a modular retrieval pipeline, and generates support responses using Google Gemini.
 
 ## Live Demo
 
 **Streamlit App:**
 https://spotify-ai-support-agent-8ayxy8hzodn4vhzkipz5un.streamlit.app/
 
-## GitHub Repository
-
-https://github.com/ishika74/hiver-support-agent
+---
 
 ## Problem Statement
 
-Customer-support teams receive a large number of repetitive questions and complaints. Manually classifying every issue and preparing a response can be time-consuming.
+Customer-support teams receive a large number of repetitive questions and complaints. Manually classifying every issue, searching previous conversations, and preparing an appropriate response can be time-consuming.
 
-This project demonstrates an AI-assisted support workflow that helps automate the initial stages of customer support:
+This project demonstrates an AI-assisted customer-support workflow that automates several stages of the support process:
 
-1. Understand the customer’s message.
+1. Understand the customer's message.
 2. Classify the issue.
-3. Retrieve relevant information from previous support conversations.
-4. Generate a response.
-5. Identify whether human escalation may be required.
+3. Detect whether the issue may require human escalation.
+4. Retrieve relevant historical support conversations.
+5. Generate or draft an appropriate support response.
+6. Provide feedback and support-ticket assistance.
+
+The repository also includes evaluation scripts for measuring classification, escalation, retrieval, and response quality.
+
+---
 
 ## Features
 
-* Interactive Streamlit user interface
+* Interactive Streamlit chat interface
 * Spotify customer-support issue classification
-* AI-generated support responses
-* Dataset-based retrieval
-* Escalation detection
-* Support-ticket assistance
-* Conversation-style interaction
-* Customer feedback controls
-* Evaluation scripts for testing the system
 * Google Gemini API integration
+* AI-generated support responses
+* TF-IDF-based retrieval of similar historical conversations
+* Conversation reconstruction from customer-support data
+* Rule-based escalation detection
+* Human-agent escalation indicators
+* Support-ticket summary generation
+* Customer feedback controls
+* Conversation history within the Streamlit session
+* Evaluation scripts and baselines
+* LLM-as-a-judge response evaluation
+* Human-calibration examples for the LLM judge
+* Streamlit Community Cloud deployment
 
-## Dataset
+---
 
-The project uses a customer-support conversation dataset containing Twitter-based customer messages and conversation relationships.
+## System Architecture
 
-The dataset includes fields such as:
+The repository contains two related workflows:
 
-* `tweet_id`
-* `author_id`
-* `inbound`
-* `created_at`
-* `text`
-* `response_tweet_id`
-* `in_response_to_tweet_id`
+### Streamlit Application
 
-The dataset is stored in:
-
-```text
-data/sample(1).csv
-```
-
-The `text` column contains the customer-support messages. The response and conversation ID columns provide information about relationships between customer messages and replies.
-
-## System Workflow
+The deployed Streamlit application provides the interactive customer-support experience:
 
 ```text
 Customer Message
@@ -69,107 +63,290 @@ Customer Message
 Issue Classification
        |
        v
-Relevant Data Retrieval
+Escalation Detection
+       |
+       v
+Google Gemini
+       |
+       v
+Support Response
+       |
+       +----> Feedback
+       |
+       +----> Support Ticket
+```
+
+### Modular Support Pipeline
+
+The repository also contains a modular pipeline used for retrieval and evaluation:
+
+```text
+Customer Message
+       |
+       v
+Intent Classification
        |
        v
 Escalation Detection
        |
        v
-AI Response Generation
+TF-IDF Retrieval
        |
        v
-Support Response
+Similar Historical Conversations
+       |
+       v
+Response Draft
 ```
+
+The modular pipeline and the deployed Streamlit application are kept as separate components so that the retrieval and evaluation components can be tested independently.
+
+---
 
 ## Project Structure
 
 ```text
-hiver-support-agent/
+spotify-ai-support-agent/
 │
-├── app/
+├── .devcontainer/
 │
-├── data/
-│   └── sample(1).csv
-│
-├── eval/
-│
-├── src/
-│   ├── app.py
-│   ├── classifier.py
-│   ├── escalation.py
-│   ├── ingest.py
-│   ├── intents.py
-│   ├── llm_client.py
-│   ├── llm_judge.py
-│   ├── pipeline.py
-│   ├── reply_generator.py
-│   ├── retrieval.py
-│   └── run_eval.py
-│
-├── requirements.txt
+├── .gitignore
 ├── README.md
-└── .gitignore
+├── requirements.txt
+│
+├── app.py
+├── classifier.py
+├── escalation.py
+├── ingest.py
+├── intents.py
+├── llm_client.py
+├── llm_judge.py
+├── pipeline.py
+├── reply_generator.py
+├── retrieval.py
+├── run_eval.py
+│
+└── sample.csv
 ```
 
-## Technologies Used
+---
 
-* Python
-* Streamlit
-* Google Gemini API
-* Pandas
-* NumPy
-* Scikit-learn
-* Python-dotenv
+## Dataset
+
+The project uses a sample of the **Customer Support on Twitter** dataset containing customer-support conversations.
+
+The dataset contains fields such as:
+
+```text
+tweet_id
+author_id
+inbound
+created_at
+text
+response_tweet_id
+in_response_to_tweet_id
+```
+
+The dataset is stored in:
+
+```text
+sample.csv
+```
+
+The `text` column contains the customer-support messages, while the response and conversation ID fields are used to identify relationships between customer messages and support responses.
+
+The ingestion module reconstructs customer → support-response exchanges and can filter conversations associated with `SpotifyCares`.
+
+---
 
 ## Main Components
 
 ### `app.py`
 
-Provides the Streamlit user interface and allows users to enter customer-support questions and view generated responses.
+Provides the Streamlit user interface.
 
-### `llm_client.py`
+It handles:
 
-Handles communication with the Google Gemini API.
+* customer message input
+* conversation history
+* issue classification
+* escalation detection
+* Gemini response generation
+* feedback controls
+* support-ticket creation
+* downloadable ticket summaries
+
+The application is the entry point for the deployed Streamlit application.
+
+Run it with:
+
+```bash
+python -m streamlit run app.py
+```
+
+---
 
 ### `classifier.py`
 
-Classifies customer messages into support-related issue categories.
+Implements keyword-based support-issue classification for the modular support pipeline.
 
-### `retrieval.py`
+The classifier identifies categories such as:
 
-Retrieves relevant information from the available support dataset.
+```text
+PLAYBACK_TECH_ISSUE
+ACCOUNT_LOGIN
+BILLING_SUBSCRIPTION
+HOW_TO_FEATURE_Q
+COMPLAINT_NEGATIVE
+PRAISE_THANKS
+```
 
-### `reply_generator.py`
+The classifier is intentionally lightweight and deterministic, making it useful as a baseline for evaluation.
 
-Generates customer-support replies using the retrieved information and AI model.
+---
+
+### `intents.py`
+
+Contains intent definitions and supporting intent metadata used by the support pipeline.
+
+---
 
 ### `escalation.py`
 
-Identifies issues that may require human support-agent involvement.
+Implements rule-based escalation detection.
 
-### `pipeline.py`
+The module considers signals such as:
 
-Connects the main processing stages into a single workflow.
+* security concerns
+* unauthorized charges
+* fraud
+* account compromise
+* legal or sensitive issues
+* repeated unresolved issues
+* high-priority support scenarios
+
+The output can be used to flag cases for human-agent review.
+
+---
 
 ### `ingest.py`
 
-Handles dataset preparation and ingestion.
+Handles preparation of the customer-support dataset.
 
-### `run_eval.py`
+It reconstructs customer/support exchanges using the conversation and response identifiers contained in the dataset.
 
-Runs evaluation procedures for the support-agent system.
+---
+
+### `retrieval.py`
+
+Implements similarity-based retrieval of historical support conversations.
+
+The retrieval system uses:
+
+```text
+TF-IDF Vectorization
+        +
+Cosine Similarity
+```
+
+Given a new customer message, it can identify similar historical customer messages and return their associated support responses.
+
+This provides a lightweight retrieval mechanism without requiring an external vector database.
+
+---
+
+### `reply_generator.py`
+
+Provides deterministic response templates for the modular support pipeline.
+
+Responses are generated based on the predicted support intent and escalation status.
+
+This component is separate from the Gemini-based response generation used by the Streamlit application.
+
+---
+
+### `llm_client.py`
+
+Provides the interface for communicating with the Google Gemini API.
+
+The module is used to send prompts to Gemini and return generated responses.
+
+---
+
+### `pipeline.py`
+
+Connects the main components of the modular support pipeline.
+
+The pipeline combines:
+
+```text
+Classification
+      ↓
+Escalation Detection
+      ↓
+Historical Conversation Retrieval
+      ↓
+Response Drafting
+```
+
+This pipeline is primarily useful for evaluation and experimentation with the support-agent components.
+
+---
 
 ### `llm_judge.py`
 
-Supports evaluation of generated responses using an AI-based judging process.
+Implements an LLM-as-a-judge evaluation process for generated support responses.
+
+Responses are evaluated across dimensions such as:
+
+* groundedness
+* correctness
+* tone
+* actionability
+
+The evaluator produces an overall quality score and can also compare model-generated responses against human-calibrated examples.
+
+The current calibration set is intentionally small and should be considered an initial evaluation rather than a statistically significant validation of the judge.
+
+---
+
+### `run_eval.py`
+
+Runs evaluation experiments for the support-agent components.
+
+The evaluation code includes checks for:
+
+* intent classification
+* baseline performance
+* escalation detection
+* support-pipeline behavior
+* generated response quality
+* LLM-as-a-judge scores
+
+The evaluation scripts are intended for experimentation and development rather than production monitoring.
+
+---
+
+## Technologies Used
+
+* **Python**
+* **Streamlit**
+* **Google Gemini API**
+* **Pandas**
+* **Scikit-learn**
+* **Python-dotenv**
+
+The retrieval system uses scikit-learn's TF-IDF vectorization and cosine similarity.
+
+---
 
 ## Local Installation
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ishika74/hiver-support-agent.git
-cd hiver-support-agent
+git clone https://github.com/ishika74/spotify-ai-support-agent.git
+cd spotify-ai-support-agent
 ```
 
 ### 2. Create a virtual environment
@@ -180,13 +357,13 @@ python -m venv venv
 
 ### 3. Activate the virtual environment
 
-For Windows PowerShell:
+#### Windows PowerShell
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
-For macOS or Linux:
+#### macOS / Linux
 
 ```bash
 source venv/bin/activate
@@ -206,87 +383,22 @@ Create a `.env` file in the project root:
 GOOGLE_API_KEY=your_gemini_api_key
 ```
 
-Never upload the `.env` file or expose the API key publicly.
+Never commit the `.env` file or expose the API key publicly.
 
-### 6. Run the application
+### 6. Run the Streamlit application
 
 ```bash
-python -m streamlit run src/app.py
+python -m streamlit run app.py
 ```
 
-The application will open in the browser.
+The application will open in your browser.
 
-## Streamlit Cloud Deployment
+---
 
-1. Open Streamlit Community Cloud.
-2. Connect your GitHub account.
-3. Select the repository:
+## Streamlit Community Cloud Deployment
 
-```text
-ishika74/hiver-support-agent
-```
+The application can be deployed using Streamlit Community Cloud.
 
-4. Select the `main` branch.
-5. Set the main file path to:
+### Configuration
 
-```text
-src/app.py
-```
-
-6. Add the Gemini API key in Streamlit Cloud Secrets:
-
-```toml
-GOOGLE_API_KEY = "your_gemini_api_key"
-```
-
-7. Deploy the application.
-
-## Evaluation
-
-The repository includes evaluation-related scripts and folders.
-
-These can be used to assess:
-
-* Issue classification
-* Response generation
-* Escalation behavior
-* Overall support-agent performance
-
-The evaluation scripts may require additional Gemini API requests and can be affected by API quota limits.
-
-## Limitations
-
-* The system’s performance depends on the quality and coverage of the dataset.
-* The dataset may not contain examples for every possible customer issue.
-* AI-generated responses may require human review.
-* Gemini API requests may be limited by free-tier quotas.
-* Escalation detection is an assistance feature and does not replace human judgment.
-* The application is a prototype and is not connected to Spotify’s internal customer-support systems.
-
-## Future Improvements
-
-* Add a larger support knowledge base.
-* Improve classification using a trained machine-learning model.
-* Add persistent conversation memory.
-* Add authentication and user management.
-* Add analytics and monitoring.
-* Add human-agent handoff functionality.
-* Add persistent support-ticket storage.
-* Improve evaluation with larger test sets.
-* Add automated feedback-based model improvement.
-
-## Security
-
-API keys must be stored using environment variables locally and Streamlit Secrets during deployment.
-
-The following files should never be committed:
-
-```text
-.env
-venv/
-__pycache__/
-```
-
-## Author
-
-Ishika Razdan
+1. Connect the GitHub repository to Streamlit Community Clou
