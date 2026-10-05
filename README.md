@@ -7,7 +7,7 @@ The application processes Spotify customer-support messages, identifies the cust
 ## Live Demo
 
 **Streamlit App:**
-https://hiver-support-agent-cvquauosx3eb3mmrqewath.streamlit.app/
+https://spotify-ai-support-agent-8ayxy8hzodn4vhzkipz5un.streamlit.app/
 
 ## GitHub Repository
 
