@@ -1,6 +1,6 @@
 # Spotify AI Support Agent
 
-An AI-assisted customer-support prototype built with Python, Streamlit, and Google's Gemini API. Developed as part of the Hiver SDE Intern assignment.
+An AI-assisted customer-support prototype built with Python, Streamlit, and Google's Gemini API.
 
 **Live Demo:**  https://spotify-ai-support-agent-8ayxy8hzodn4vhzkipz5un.streamlit.app/
 
